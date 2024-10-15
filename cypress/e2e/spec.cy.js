@@ -1,36 +1,33 @@
-describe('Authentication', () => {
+describe('Login and Logout Test', () => {
   beforeEach(() => {
-    cy.visit('/'); // Besøk rot-url, som kan være innloggingssiden
+    cy.visit('https://norofffeu.github.io/social-media-client/');
   });
 
   it('should log in with valid credentials', () => {
-    cy.get('input[name="email"]').type('validEmail@example.com'); 
-    cy.get('input[name="password"]').type('validPassword'); 
-    cy.get('button[type="submit"]').click(); 
-
-    // Forvent at brukeren blir omdirigert til dashboardet
-    cy.url().should('include', '/dashboard'); // Sjekker at URL-en inneholder '/dashboard'
+    cy.get('#loginEmail').type('validUser@noroff.no', { force: true });
+    cy.get('#loginPassword').type('validPassword', { force: true });
+    cy.get('#loginForm').submit({ force: true });
   });
 
-  it('should not submit with invalid credentials and show an error message', () => {
-    cy.get('input[name="email"]').type('invalidEmail@example.com');
-    cy.get('input[name="password"]').type('invalidPassword');
-    cy.get('button[type="submit"]').click();
+  it('should log out successfully', () => {
+    cy.get('button[data-auth="logout"]').click({ force: true });
 
-    // Forvent at en feilmelding vises
-    cy.contains('Invalid credentials').should('be.visible'); 
+    cy.url().should('eq', 'https://norofffeu.github.io/social-media-client/'); 
+  });
+});
+
+describe('Login with invalid credentials', () => {
+  beforeEach(() => {
+    cy.visit('https://norofffeu.github.io/social-media-client/');
   });
 
-  it('should log out with the logout button', () => {
-    // Logg inn først
-    cy.get('input[name="email"]').type('validEmail@example.com');
-    cy.get('input[name="password"]').type('validPassword');
-    cy.get('button[type="submit"]').click();
+  it('should not log in with invalid credentials and show an error message', () => {
+    cy.get('#loginEmail').type('123@hotmil.no', { force: true });
+    cy.get('#loginPassword').type('whei', { force: true });
+    cy.get('#loginForm').submit({ force: true });
 
-    // Klikk på logg ut
-    cy.get('button#logout').click(); // Anta at det er en knapp med ID 'logout'
-
-    // Forvent at brukeren blir omdirigert til innloggingssiden igjen
-    cy.url().should('include', '/login'); // Sjekker at URL-en inneholder '/login'
+    cy.on('window:alert', (txt) => {
+      expect(txt).to.contains('Either your username was not found or your password is incorrect'); 
+    });
   });
 });

@@ -2,11 +2,36 @@ import { login } from './login';
 import { logout } from './logout';
 import * as storage from '../../storage/index.js';
 
+// Mock storage module
 jest.mock('../../storage/index.js');
 
+// Mock localStorage
+const localStorageMock = (() => {
+    let store = {};
+    return {
+        getItem(key) {
+            return store[key] || null;
+        },
+        setItem(key, value) {
+            store[key] = value.toString();
+        },
+        clear() {
+            store = {};
+        },
+        removeItem(key) {
+            delete store[key];
+        },
+    };
+})();
+
 describe('Auth Functions', () => {
+    beforeAll(() => {
+        // Replace global localStorage with our mock
+        global.localStorage = localStorageMock;
+    });
+
     beforeEach(() => {
-        localStorage.clear();
+        localStorage.clear(); // Clear mock storage before each test
         jest.clearAllMocks(); 
     });
 
@@ -24,7 +49,7 @@ describe('Auth Functions', () => {
     });
 
     test('logout clears the token from browser storage', async () => {
-        // checking for a successful login
+        // Checking for a successful login
         global.fetch = jest.fn(() =>
             Promise.resolve({
                 ok: true,
@@ -33,9 +58,9 @@ describe('Auth Functions', () => {
         );
 
         const credentials = { email: 'user@example.com', password: 'pass' };
-        await login(credentials.email, credentials.password); // first login
+        await login(credentials.email, credentials.password); // First login
         logout();
-        expect(localStorage.getItem('token')).toBeNull(); // check if token is removed
+        expect(localStorage.getItem('token')).toBeNull(); // Check if token is removed
     });
 
     test('login throws error on failed fetch', async () => {

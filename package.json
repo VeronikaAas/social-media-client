@@ -48,12 +48,16 @@
     ]
   },
   "jest": {
-    "testEnvironment": "jsdom",
-    "testEnvironmentOptions": {
-      "resources": "usable",
-      "runScripts": "dangerously",
-      "url": "http://localhost/"
-    }
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss)$": "identity-obj-proxy"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/build/"
+    ]
   },
   "babel": {
     "presets": [
