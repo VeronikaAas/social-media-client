@@ -6,7 +6,7 @@
   "scripts": {
     "build": "sass src/scss:dist/css",
     "start": "sass --watch src/scss:dist/css & live-server",
-    "format": "prettier --write 'src/**/*.js'",
+    "format": "prettier --write \"src/**/*.js\"",
     "lint": "eslint .",
     "prepare": "husky install",
     "test": "jest",
